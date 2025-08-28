@@ -34,7 +34,7 @@ import java.time.Duration;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
-@Slf4j
+
 public class PaymentTests {
 
 
@@ -103,8 +103,7 @@ public class PaymentTests {
                             statusResponse.set(statusResponseFinal);
                             return true;
                         }
-                    } catch (IOException e) {
-                        log.warn("status error");
+                    } catch (IOException ignored) {
                     }
                     return false;
                 });
@@ -144,7 +143,6 @@ public class PaymentTests {
         try {
             client = new OkHttpClient.Builder()
                     .addInterceptor(authInterceptor)
-                    .sslSocketFactory(getUnsafeSslSocketFactory(), getUnsafeTrustManager())
                     .hostnameVerifier((hostname, session) -> true)
                     .build();
         } catch (Exception e) {
@@ -172,52 +170,6 @@ public class PaymentTests {
     @AfterSuite
     public void cleanup() {
         driver.quit();
-    }
-
-
-    public static SSLSocketFactory getUnsafeSslSocketFactory() throws Exception {
-        TrustManager[] trustAllCerts = new TrustManager[]{
-                new X509TrustManager() {
-
-
-                    public void checkClientTrusted(X509Certificate[] chain, String authType) {
-                    }
-
-
-                    public void checkServerTrusted(X509Certificate[] chain, String authType) {
-                    }
-
-
-                    public X509Certificate[] getAcceptedIssuers() {
-                        return new X509Certificate[]{};
-                    }
-                }
-        };
-
-        SSLContext sslContext = SSLContext.getInstance("TLS");
-        sslContext.init(null, trustAllCerts, new SecureRandom());
-        return sslContext.getSocketFactory();
-    }
-
-
-    public static X509TrustManager getUnsafeTrustManager() {
-        return (X509TrustManager) new TrustManager[]{
-                new X509TrustManager() {
-
-
-                    public void checkClientTrusted(X509Certificate[] chain, String authType) {
-                    }
-
-
-                    public void checkServerTrusted(X509Certificate[] chain, String authType) {
-                    }
-
-
-                    public X509Certificate[] getAcceptedIssuers() {
-                        return new X509Certificate[]{};
-                    }
-                }
-        }[0];
     }
 
 
